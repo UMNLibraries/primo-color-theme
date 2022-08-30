@@ -1,5 +1,5 @@
 import * as sass from 'node-sass';
-import { mkdtemp, readFile, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import * as os from 'node:os';
 import fetch from 'node-fetch';
 import { pipeline } from 'node:stream/promises';
@@ -23,26 +23,27 @@ await writeFile('result.css', result.css);
 //if (!argv[2]) throw new Error('missing filename argument');
 //const colorsFile = argv[2];
 //const customColors = await readFile(colorsFile).then(JSON.parse);
+
+
+const tmpdir = await mkdtemp(path.join(os.tmpdir(), 'primo-scss-'));
+const defaultColorsFile = path.join(tmpdir, 'styles', 'colors.json');
+
 const customColors = JSON.parse(readFileSync(process.stdin.fd, 'utf8'));
 
-const tmpdir = await mkdtemp(path.join(os.tmpdir(), 'primo-scss'));
-process.chdir(tmpdir);
 
 const scssFile = 'scsss.tar.gz'; // no, that's not a typo
 const response = await fetch(`https://umn-psb.primo.exlibrisgroup.com/discovery/lib/${scssFile}`);
 if (!response.ok) throw new Error(`bad response: ${response.statusText}`);
-const unzip = zlib.createGunzip();
-const extract = tar.extract(tmpdir, {
-  map: header => {
-    header.name = header.name.replace('src/main/webapp', '');
-    return header;
-  }
-});
 
 await pipeline(
   response.body,
-  unzip,
-  extract,
+  zlib.createGunzip(),
+  tar.extract(tmpdir, {
+    map: header => {
+      header.name = header.name.replace('src/main/webapp', '');
+      return header;
+    }
+  }),
 );
 
 
@@ -66,4 +67,13 @@ await pipeline(
   applyTemplate,
   process.stdout,
 );
+
+// TODO:
+// write variables file
+// generate css
+// apply browser-specific stuff
+// write output
+// delete tmpdir
+
+await rm(tmpdir, { recursive: true });
 
