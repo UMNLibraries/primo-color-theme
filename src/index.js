@@ -7,6 +7,7 @@ import path from 'node:path';
 import { createReadStream, createWriteStream, readFileSync } from 'node:fs';
 import zlib from 'node:zlib';
 import tar from 'tar-fs';
+import { promisify } from 'node:util';
 import { argv } from 'node:process';
 import tempate from 'lodash.template';
 import template from 'lodash.template';
@@ -62,18 +63,21 @@ async function* applyTemplate(source) {
 }
 
 const templateFile = path.join(tmpdir, 'styles', 'partials', '_variables.tmpl.scss');
+const variablesFile = path.join(tmpdir, 'styles', 'partials', '_variables.scss');
 await pipeline(
   createReadStream(templateFile, { encoding: 'utf8' }),
   applyTemplate,
-  process.stdout,
+  createWriteStream(variablesFile, { encoding: 'utf8' }),
 );
 
+const render = promisify(sass.render);
+const result = await render({
+  file: path.join(tmpdir, 'styles', 'main.scss'),
+});
+process.stdout.write(result.css);
+
 // TODO:
-// write variables file
-// generate css
 // apply browser-specific stuff
-// write output
-// delete tmpdir
 
 await rm(tmpdir, { recursive: true });
 
