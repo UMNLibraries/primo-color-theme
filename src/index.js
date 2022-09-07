@@ -10,7 +10,6 @@ import zlib from 'node:zlib';
 import tar from 'tar-fs';
 import { promisify } from 'node:util';
 import { argv } from 'node:process';
-import tempate from 'lodash.template';
 import template from 'lodash.template';
 
 //if (!argv[2]) throw new Error('missing filename argument');
@@ -21,13 +20,13 @@ const tmpdir = await mkdtemp(path.join(os.tmpdir(), 'primo-scss-'));
 const css = await downloadScss()
   .then(loadColors)
   .then(updateTheme)
-  .then(renderCss);
+  .then(renderCss)
+  .finally(() => rm(tmpdir, { recursive: true }))
 await pipeline(
   Readable.from(css.split("\n")),
   colorHookFilter(),
   process.stdout,
 )
-await rm(tmpdir, { recursive: true });
 
 async function downloadScss() {
   const scssFile = 'scsss.tar.gz'; // no, that's not a typo
