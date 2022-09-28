@@ -17,14 +17,14 @@ const argv = yargs(process.argv.slice(2))
   .argv;
 
 const colorHookFilter = () => {
-  let colorHook = false;
-  const isHooKStart = chunk => chunk.includes('/* primary color hook */');
+  let inColorHook = false;
+  const isHookStart = chunk => chunk.includes('/* primary color hook */');
   const isHookEnd = chunk => chunk.includes('/* primary color hook end*/');
   return new Transform({
     transform(chunk, _, next) {
-      if (colorHook ||= isHooKStart(chunk)) {
+      if (inColorHook ||= isHookStart(chunk)) {
         this.push(chunk + "\n");
-        colorHook = !isHookEnd(chunk);
+        inColorHook = !isHookEnd(chunk);
       }
       next();
     }
