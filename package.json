@@ -2,12 +2,15 @@
   "name": "primo-color-theme",
   "type": "module",
   "version": "1.0.0",
-  "description": "",
+  "description": "Generates Primo VE color theme",
   "main": "index.js",
   "keywords": [],
-  "author": "gpeterso@umn.edu",
+  "author": "Jeff Peterson <gpeterso@umn.edu>",
   "bin": {
-    "primo-colors": "index.js"
+    "primo-color-theme": "index.js"
+  },
+  "scripts": {
+    "postversion": "git push && git push --tags"
   },
   "dependencies": {
     "lodash.template": "^4.5.0",
