@@ -6,6 +6,9 @@ _Note: this only works with **Primo VE**_
 ## Why would I want to use this?
 Likely, this is only of interest to Primo VE sites that do not use [Primo Studio](https://github.com/ExLibrisGroup/Primo-Studio) or the [Primo Development Environment](https://github.com/ExLibrisGroup/primo-explore-devenv). Color theme generation is already included in those tools. 
 
+## Installation
+`npm install @umn-libraries/primo-color-theme`
+
 ## Usage
 First, define your color theme in a `colors.json` file (see example below.) Then run the following command to generate a CSS file (replace `name-primo.exlibrisgroup.com` with your Primo VE server name):
 
